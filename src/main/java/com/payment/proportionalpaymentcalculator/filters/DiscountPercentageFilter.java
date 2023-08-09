@@ -9,14 +9,14 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Component
-public class IncreaseFilter implements OrderFilter {
+public class DiscountPercentageFilter implements OrderFilter {
 
     @Override
     public void paymentFilter(PaymentRequest paymentRequest, Order order) {
         BigDecimal initialPriceItems = calculateInitialPrice(order);
         BigDecimal totalPriceItemsWithAdjustments = calculateTotalPrice(order);
-        BigDecimal increasePerFriend = calculateIncreasePerFriend(paymentRequest, initialPriceItems);
-        BigDecimal finalProportionalPrice = calculateFinalProportionalPrice(totalPriceItemsWithAdjustments, increasePerFriend);
+        BigDecimal discountAmount = calculateDiscountAmount(paymentRequest, initialPriceItems);
+        BigDecimal finalProportionalPrice = calculateFinalProportionalPrice(totalPriceItemsWithAdjustments, discountAmount);
 
         order.setOrderAmount(finalProportionalPrice);
     }
@@ -28,15 +28,17 @@ public class IncreaseFilter implements OrderFilter {
     }
 
     private BigDecimal calculateTotalPrice(Order order) {
-        return order.getOrderAmount() == null ? calculateInitialPrice(order) : order.getOrderAmount();
+        return order.getOrderAmount() == null ? calculateInitialPrice(order)
+                : order.getOrderAmount();
     }
 
-    private BigDecimal calculateIncreasePerFriend(PaymentRequest paymentRequest, BigDecimal initialPriceItems) {
-        return initialPriceItems.multiply(paymentRequest.getIncrease())
-                .divide(paymentRequest.getTotalAmount(), 2, RoundingMode.HALF_UP);
+    private BigDecimal calculateDiscountAmount(PaymentRequest paymentRequest, BigDecimal initialPriceItems) {
+        BigDecimal discountPercent = BigDecimal.valueOf(paymentRequest.getDiscountPercent());
+        return initialPriceItems.multiply(discountPercent.divide(BigDecimal.valueOf(100)))
+                .setScale(2, RoundingMode.HALF_UP);
     }
 
-    private BigDecimal calculateFinalProportionalPrice(BigDecimal totalPriceItemsWithAdjustments, BigDecimal increasePerFriend) {
-        return totalPriceItemsWithAdjustments.add(increasePerFriend);
+    private BigDecimal calculateFinalProportionalPrice(BigDecimal totalPriceItemsWithAdjustments, BigDecimal discountAmount) {
+        return totalPriceItemsWithAdjustments.subtract(discountAmount);
     }
 }

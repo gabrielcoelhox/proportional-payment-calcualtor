@@ -12,7 +12,7 @@ import java.math.RoundingMode;
 public class DiscountFilter implements OrderFilter {
 
     @Override
-    public void filter(PaymentRequest paymentRequest, Order order) {
+    public void paymentFilter(PaymentRequest paymentRequest, Order order) {
         BigDecimal initialPriceItems = calculateInitialPrice(order);
         BigDecimal totalPriceItemsWithDiscountsAndIncreases = calculateTotalPrice(order);
         BigDecimal discountPerFriend = calculateDiscountPerFriend(paymentRequest, initialPriceItems);

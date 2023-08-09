@@ -4,5 +4,6 @@ import com.payment.proportionalpaymentcalculator.entities.Order;
 import com.payment.proportionalpaymentcalculator.rest.PaymentRequest;
 
 public interface OrderFilter {
-    public void filter (PaymentRequest paymentRequest, Order order);
+    public void paymentFilter(PaymentRequest paymentRequest, Order order);
+
 }
